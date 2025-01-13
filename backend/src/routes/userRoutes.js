@@ -14,5 +14,5 @@ router.patch('/:id/role', authenticateToken, authenticateAdmin, UserController.c
 router.get('/:id', authenticateToken, UserController.getUserById); // Get user by ID
 router.put('/:id', authenticateToken, UserController.updateUser); // Update user
 router.patch('/:id/password', authenticateToken, UserController.updatePassword); // Update password
-
+router.get('/:id/teams',authenticateToken, UserController.getUserTeams); //get user teams
 module.exports = router;

@@ -1,28 +1,28 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
-// // Create a new user
-// exports.createUser = async (req, res) => {
-//   const { name, email, password, role } = req.body;
+const Team = require('../models/Team');
 
-//   try {
-//     // Hash the password before saving
-//     const hashedPassword = await bcrypt.hash(password, 10);
+// Function to get all teams that a user is part of
+exports.getUserTeams = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//     const newUser = new User({
-//       name,
-//       email,
-//       password: hashedPassword,
-//       role
-//     });
+    // Find teams where the user is part of the 'members' array
+    const teams = await Team.find({ 'members.user': id })
+      .populate('admin', 'name email')  // Populate the admin field to show admin info
+      .populate('members.user', 'name email');  // Populate the members field to show user details
 
-//     await newUser.save();
-//     res.status(201).json({ message: 'User created successfully!' });
-//   } catch (err) {
-//     res.status(500).json({ message: 'Error creating user', error: err });
-//   }
-// };
+    if (teams.length === 0) {
+      return res.status(404).json({ message: 'No teams found for this user' });
+    }
 
+    return res.status(200).json({ message: 'Teams fetched successfully', teams });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err });
+  }
+};
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
