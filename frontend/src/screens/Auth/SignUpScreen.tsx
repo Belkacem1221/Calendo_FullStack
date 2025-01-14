@@ -23,6 +23,7 @@ export default function SignUpScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, name: email.split('@')[0] }),
+        mode: 'no-cors', // Disables CORS
       });
 
       if (response.status === 201) {
@@ -43,7 +44,7 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1055/1055687.png' }}
+        //source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1055/1055687.png' }}
         style={styles.logo}
       />
       <Text style={styles.title}>Calendo</Text>
