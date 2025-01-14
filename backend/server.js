@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const userRoutes = require('./src/routes/userRoutes');
@@ -18,7 +17,6 @@ dotenv.config(); // Load environment variables
 const app = express();
 
 // Middleware
-app.use(cors()); // Enable CORS
 app.use(bodyParser.json()); // Parse incoming JSON requests
 
 // Database connection (MongoDB Atlas)
