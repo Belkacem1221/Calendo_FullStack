@@ -17,12 +17,13 @@ dotenv.config(); // Load environment variables
 // Create an Express app
 const app = express();
 
-// CORS configuration for all origins (you can change '*' to a specific URL if necessary)
+const allowedOrigins = process.env.NODE_ENV === 'production' ? ['https://calendo-full-qs0us5k1e-yanis-s-projects.vercel.app'] : ['http://localhost:3000']; 
 app.use(cors({
-  origin: '*', // Allow all origins (use specific URL for production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 
 // Middleware
 app.use(bodyParser.json()); // Parse incoming JSON requests

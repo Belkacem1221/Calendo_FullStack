@@ -8,7 +8,7 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const BASE_URL = 'https://calendo-full.vercel.app/api/auth/register';
+  const BASE_URL = 'https://calendo-full-qs0us5k1e-yanis-s-projects.vercel.app/api/auth/register';
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
@@ -23,7 +23,6 @@ export default function SignUpScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, name: email.split('@')[0] }),
-        mode: 'no-cors', // Disables CORS
       });
 
       if (response.status === 201) {
