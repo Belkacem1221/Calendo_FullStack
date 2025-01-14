@@ -20,7 +20,7 @@ import TeamDetailsScreen from './src/screens/Teams/TeamDetailsScreen';
 // Events Screens
 import AddEventScreen from './src/screens/Events/AddEventScreen';
 import EventDetailsScreen from './src/screens/Events/EventDetailsScreen';
-import EditEventScreen from './src/screens/Events/EditEventScreen';
+//import EditEventScreen from './src/screens/Events/EditEventScreen';
 
 // Bucketlists Screens
 import BucketlistsScreen from './src/screens/Bucketlists/BucketlistsScreen';
@@ -54,7 +54,7 @@ export default function App() {
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
-          options={{ title: 'Forgot Password', headerShown: true }}
+          //options={{ title: 'Forgot Password', headerShown: true }}
         />
         <Stack.Screen
           name="Login"
