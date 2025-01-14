@@ -2,98 +2,109 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+
+// Screen imports
 import HomeScreen from '../src/screens/Home/HomeScreen';
 import TeamsScreen from '../src/screens/Teams/TeamsScreen';
 import NotificationsScreen from '../src/screens/Notifications/NotificationsScreen';
 import UserProfileScreen from '../src/screens/Profile/UserProfileScreen';
-import AddEventScreen from '../src/screens/Events/AddEventScreen';
 
+// Type for the tab navigation
+type TabParamList = {
+  Home: undefined;
+  Teams: undefined;
+  AddEvent: undefined;
+  Notifications: undefined;
+  Profile: undefined;
+};
 
-
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function AppNavigator() {
+  const navigation = useNavigation();
+
+  const handleAddEvent = () => {
+    // Utilisez la navigation depuis le stack parent
+    navigation.navigate('AddEvent' as never);
+  };
+
+  const screenOptions: BottomTabNavigationOptions = {
+    headerShown: false,
+    tabBarShowLabel: true,
+    tabBarStyle: styles.tabBar,
+    tabBarActiveTintColor: '#7F57FF',
+    tabBarInactiveTintColor: '#555',
+  };
+
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: true,
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#7F57FF',
-        tabBarInactiveTintColor: '#555',
-      }}
-    >
-      {/* Home Tab */}
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={22} color={color} />
-          ),
-          tabBarLabel: 'Home',
-        }}
-      />
+    <Tab.Navigator screenOptions={screenOptions}>
+  <Tab.Screen
+    name="Home"
+    component={HomeScreen}
+    options={{
+      tabBarIcon: ({ color }) => (
+        <Ionicons name="home-outline" size={22} color={color} />
+      ),
+      tabBarLabel: 'Home',
+    }}
+  />
+  
 
-      {/* Teams Tab */}
-      <Tab.Screen
-        name="Teams"
-        component={TeamsScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="group" size={26} color={color} />
-          ),
-          tabBarLabel: 'Teams',
-        }}
-      />
+  <Tab.Screen
+    name="Teams"
+    component={TeamsScreen}
+    options={{
+      tabBarIcon: ({ color }) => (
+        <MaterialIcons name="group" size={26} color={color} />
+      ),
+      tabBarLabel: 'Teams',
+    }}
+  />
 
-      
+  {/* Utiliser une clé existante pour AddEvent */}
+  <Tab.Screen
+    name="AddEvent"
+    component={View} // Ce composant ne sera jamais affiché
+    options={{
+      tabBarButton: () => (
+        <TouchableOpacity
+          style={styles.centralButton}
+          onPress={() => navigation.navigate('AddEvent' as never)} // Navigue vers AddEvent
+        >
+          <View style={styles.buttonInner}>
+            <Ionicons name="add" size={26} color="#FFF" />
+          </View>
+        </TouchableOpacity>
+      ),
+      tabBarLabel: '',
+    }}
+  />
 
-      {/* Central Button for Adding Event */}
-      <Tab.Screen
-        name="AddEvent"
-        component={AddEventScreen}
-        options={{
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              style={styles.centralButton}
-              onPress={(event) => props.onPress && props.onPress(event)}
-            >
-              <View style={styles.buttonInner}>
-                <Ionicons name="add" size={26} color="#FFF" />
-              </View>
-            </TouchableOpacity>
-          ),
-          tabBarLabel: '',
-        }}
-      />
+  <Tab.Screen
+    name="Notifications"
+    component={NotificationsScreen}
+    options={{
+      tabBarIcon: ({ color }) => (
+        <Ionicons name="notifications-outline" size={22} color={color} />
+      ),
+      tabBarLabel: 'Notif',
+    }}
+  />
 
- 
+  <Tab.Screen
+    name="Profile"
+    component={UserProfileScreen}
+    options={{
+      tabBarIcon: ({ color }) => (
+        <Feather name="user" size={22} color={color} />
+      ),
+      tabBarLabel: 'Profile',
+    }}
+  />
+</Tab.Navigator>
 
-      {/* Notifications Tab */}
-      <Tab.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="notifications-outline" size={22} color={color} />
-          ),
-          tabBarLabel: 'Notif',
-        }}
-      />
-
-      {/* Profile Tab */}
-      <Tab.Screen
-        name="Profile"
-        component={UserProfileScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Feather name="user" size={22} color={color} />
-          ),
-          tabBarLabel: 'Profile',
-        }}
-      />
-    </Tab.Navigator>
   );
 }
 

@@ -1,9 +1,9 @@
-export interface Event {
-    id?: string; // Peut être généré localement ou récupéré depuis l'API
-    title: string;
-    location: string;
-    date: string; // Format ISO
-    time: string; // Format ISO
-    category: string;
-  }
-  
+export type Event = {
+  id?: string;
+  title: string;
+  location: string;
+  date: string; // ISO date string
+  time: string; // ISO time string
+  participants?: string[]; // Liste des IDs des participants
+  category?: string; // Catégorie ou équipe
+};

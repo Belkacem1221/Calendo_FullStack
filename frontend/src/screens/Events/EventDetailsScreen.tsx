@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -16,29 +16,43 @@ export default function EventDetailsScreen() {
   const { eventId } = route.params;
 
   const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const fetchedEvent = await EventController.getEventById(eventId);
-        if (fetchedEvent) {
-          setEvent(fetchedEvent);
+        const fetchedEvent = await EventController.getUserEvents(eventId);
+        if (fetchedEvent && fetchedEvent.length > 0) {
+          setEvent(fetchedEvent[0]);
         } else {
-          alert("L'événement n'a pas été trouvé !");
+          Alert.alert("Erreur", "L'événement n'a pas été trouvé !");
           navigation.goBack();
         }
       } catch (error) {
-        alert("Erreur lors de la récupération des détails de l'événement.");
+        Alert.alert("Erreur", "Impossible de récupérer les détails de l'événement.");
+        navigation.goBack();
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchEventDetails();
   }, [eventId]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Chargement des détails...</Text>
+      </View>
+    );
+  }
 
   if (!event) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>Chargement...</Text>
+        <Text style={styles.errorText}>Aucun détail disponible pour cet événement.</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>Retour</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -72,7 +86,7 @@ export default function EventDetailsScreen() {
         </View>
       </View>
 
-      {/* Vote Button */}
+      {/* Action Button */}
       <TouchableOpacity
         style={styles.voteButton}
         onPress={() => navigation.navigate('VoteScreen', { eventId })}
@@ -84,17 +98,27 @@ export default function EventDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F5F5' },
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+    paddingHorizontal: 20,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#7F57FF', // Same purple as vote button
-    paddingVertical: 40, 
-    paddingHorizontal: 20,
+    backgroundColor: '#7F57FF',
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
     marginBottom: 20,
   },
   backButton: {
     marginRight: 10,
+  },
+  backButtonText: {
+    color: '#FFF',
+    fontSize: 16,
   },
   headerTitle: {
     fontSize: 24,
@@ -105,34 +129,49 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
-    color: '#333',
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#FF0000',
   },
   eventDetailsContainer: {
-    margin: 20,
     backgroundColor: '#FFF',
     padding: 20,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
     elevation: 3,
   },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 10 },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-  details: { fontSize: 16, color: '#666', marginLeft: 8 },
+  details: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
   voteButton: {
-    marginTop: 20,
-    marginHorizontal: 20,
+    marginTop: 30,
     backgroundColor: '#6495ED',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   voteButtonText: {
     color: '#FFF',
-    fontWeight: 'bold',
     fontSize: 16,
-    alignSelf: 'center',
+    fontWeight: 'bold',
   },
 });

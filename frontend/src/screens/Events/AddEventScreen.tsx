@@ -37,23 +37,29 @@ export default function AddEventScreen() {
   };
 
   const handleCreateEvent = async () => {
-    if (!eventName || !team || !location) {
+    if (!eventName || !team || !location || !startTime || !endTime) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
-    const newEvent: Event = {
+    const newEvent = {
       title: eventName,
-      location,
-      date: startTime.toISOString(),
-      time: endTime.toISOString(),
-      category: team,
+      location: location,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      teamId: team, // Assurez-vous que `team` contient un ID d'équipe valide
     };
 
-    await EventController.createEvent(newEvent);
-    Alert.alert('Succès', 'Événement créé avec succès');
-    navigation.goBack();
+    try {
+      await EventController.createEvent(newEvent);
+      Alert.alert('Succès', 'Événement créé avec succès');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'événement :', error);
+      Alert.alert('Erreur', error instanceof Error ? error.message : 'Impossible de créer l\'événement');
+    }
   };
+  
 
   const showDateTimePicker = (type: 'start' | 'end') => {
     if (type === 'start') {
