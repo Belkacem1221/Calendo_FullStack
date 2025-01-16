@@ -92,6 +92,8 @@ export default function GetStartedScreen() {
       const data = await response.json();
       if (data.authUrl) {
         Linking.openURL(data.authUrl); // Redirect user to Google OAuth page
+      } else {
+        Alert.alert('Error', 'Failed to retrieve the authentication URL.');
       }
     } catch (error) {
       console.error('Calendar permission error:', error);
