@@ -33,7 +33,7 @@ export default function GetStartedScreen() {
     Linking.addEventListener('url', handleUrl);
 
     return () => {
-      Linking.removeEventListener('url', handleUrl);
+      (Linking as any).removeEventListener('url', handleUrl);
     };
   }, []);
 
