@@ -1,13 +1,12 @@
 const dotenv = require('dotenv');
 dotenv.config();
 const { google } = require('googleapis');
-const { google: googleConfig} = require('../config/oauthConfig');
 
 
 const oauth2Client = new google.auth.OAuth2(
-    googleConfig.clientId,
-    googleConfig.clientSecret,
-    googleConfig.redirectUri
+    process.env.clientId,
+    process.env.clientSecret,
+    process.env.redirectUri
   );
 
 
