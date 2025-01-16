@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Linking} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { syncGoogleCalendar } from '../services/CalendarService';
@@ -19,19 +19,21 @@ export default function GetStartedScreen() {
 
   useEffect(() => {
     checkAuthStatus();
+
     const handleUrl = ({ url }: { url: string }) => {
       // Parse the URL from Google OAuth callback
-      const { queryParams } = (Linking as any).parse(url);
-      if (queryParams?.code) {
-        // Send the code to your backend for token exchange
-        handleGoogleCallback(queryParams.code);
+      const queryParams = new URLSearchParams(url.split('?')[1]);
+      const authCode = queryParams.get('code');
+
+      if (authCode) {
+        handleGoogleCallback(authCode);
       }
     };
 
-    (Linking as any).addEventListener('url', handleUrl);
+    Linking.addEventListener('url', handleUrl);
 
     return () => {
-      (Linking as any).removeEventListener('url', handleUrl);
+      Linking.removeEventListener('url', handleUrl);
     };
   }, []);
 
@@ -183,7 +185,7 @@ export default function GetStartedScreen() {
 
       <TouchableOpacity
         style={[styles.getStartedButton, (!authStatus.hasCalendarAccess || isLoading) && styles.disabledButton]}
-        onPress={() => navigation.navigate('Main'as never)}
+        onPress={() => navigation.navigate('Main' as never)}
         disabled={!authStatus.hasCalendarAccess || isLoading}
       >
         <Text style={styles.getStartedButtonText}>Start</Text>
