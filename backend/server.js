@@ -12,6 +12,7 @@ const googleAuthRoutes = require('./src/routes/googleAuthRoutes');
 const googleCalendarRoutes = require('./src/routes/googleCalendarRoutes');
 const appleCalendarRoutes = require('./src/routes/appleCalendarRoutes');
 const teamCalendarRoutes = require('./src/routes/teamCalendarRoutes'); // Team calendar routes
+
 dotenv.config(); // Load environment variables
 
 // Create an Express app
