@@ -19,11 +19,5 @@
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"
     }
-  ],
-  "env": {
-    "MONGO_URI": "mongodb+srv://yaciniyanisb:aaLOEQrE0rturVVp@calendodb.muzu4.mongodb.net/?retryWrites=true&w=majority&appName=CalendoDB",
-    "PORT": "5000",
-    "JWT_SECRET": "ShrekYanis12",
-    "NODE_ENV": "production"
-  }
+  ]
 }
