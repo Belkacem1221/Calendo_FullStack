@@ -17,13 +17,17 @@ dotenv.config(); // Load environment variables
 // Create an Express app
 const app = express();
 
-const allowedOrigins = process.env.NODE_ENV === 'production' ? ['https://calendo-full-qs0us5k1e-yanis-s-projects.vercel.app'] : ['http://localhost:3000']; 
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// CORS configuration based on environment (development or production)
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://calendo-full.vercel.app'  // Production frontend URL (replace with your actual URL)
+    : '*',  // Allow all origins in development (this bypasses CORS for local development)
+  credentials: true, // Allow cookies if needed
+};
 
+console.log('CORS Configuration:', corsOptions.origin); // Log the origin being used
+
+app.use(cors(corsOptions)); // Apply CORS middleware
 
 // Middleware
 app.use(bodyParser.json()); // Parse incoming JSON requests

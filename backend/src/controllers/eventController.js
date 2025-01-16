@@ -148,3 +148,71 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ message: 'Error deleting event', error });
   }
 };
+
+exports.addVoteToEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const { option } = req.body;
+  const userId = req.user.id;  // The user making the vote
+
+  // Validation: Check if the option is valid
+  if (!option) {
+    return res.status(400).json({ message: 'Option is required' });
+  }
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the user is already in the list of voters for this option
+    const existingVote = event.votes.find(vote => vote.option === option);
+    if (existingVote) {
+      // Check if the user has already voted for this option
+      if (existingVote.voters.includes(userId)) {
+        return res.status(400).json({ message: 'You have already voted for this option' });
+      }
+      // Add the user to the voters array
+      existingVote.voters.push(userId);
+    } else {
+      // If no vote exists for this option, create a new one
+      event.votes.push({
+        option: option,
+        voters: [userId]
+      });
+    }
+
+    await event.save();
+    res.status(200).json({ message: 'Vote added successfully', event });
+  } catch (error) {
+    console.error('Error voting on event:', error);
+    res.status(500).json({ message: 'Error voting on event', error });
+  }
+};
+
+exports.getVotesForEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const event = await Event.findById(eventId)
+      .populate('votes.voters', 'name email');  // Populate voter details (name, email)
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Respond with the votes and the users who voted for each option
+    const votes = event.votes.map(vote => ({
+      option: vote.option,
+      voters: vote.voters.map(voter => ({
+        name: voter.name,
+        email: voter.email
+      }))
+    }));
+
+    res.status(200).json({ votes });
+  } catch (error) {
+    console.error('Error retrieving event votes:', error);
+    res.status(500).json({ message: 'Error retrieving event votes', error });
+  }
+};

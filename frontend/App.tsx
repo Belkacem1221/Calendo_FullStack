@@ -149,7 +149,7 @@ export default function App() {
         />
         <Stack.Screen
           name="EditEvent"
-          component={EditEventScreen}
+          component={EventDetailsScreen}
           options={{ title: 'Edit Event', headerShown: false }}
         />
 
