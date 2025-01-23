@@ -1,56 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const BASE_URL = 'https://calendo-full.vercel.app/api/auth/login';
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      
-  
-      if (response.status === 200) {
-        const data = await response.json();
-  
-        // Récupérer le token et le stocker
-        const token = data.token;
-        if (token) {
-          await AsyncStorage.setItem('authToken', token); // Stockage du token
-          Alert.alert('Succès', 'Connexion réussie !');
-          navigation.navigate('GetStarted' as never); 
-        } else {
-          Alert.alert('Erreur', "Le token n'a pas été fourni par le serveur.");
-        }
-      } else if (response.status === 401) {
-        Alert.alert('Erreur', 'Email ou mot de passe incorrect.');
-      } else {
-        Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erreur', 'Impossible de se connecter. Vérifiez votre connexion.');
-    }
-  };
   return (
     <View style={styles.container}>
+      {/* Logo */}
       <Image
-        source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1055/1055687.png' }}
+        source={require('../../../assets/logo-transparent.png')}
         style={styles.logo}
       />
+
+      {/* Title */}
       <Text style={styles.title}>Calendo</Text>
       <Text style={styles.subtitle}>Connexion</Text>
+
+      {/* Registration Navigation */}
       <Text style={styles.registerText}>
         Si vous n'avez pas de compte{' '}
         <Text
@@ -60,36 +27,42 @@ export default function LoginScreen() {
           inscrivez-vous ici !
         </Text>
       </Text>
+
+      {/* Input Fields */}
       <TextInput
         style={styles.input}
         placeholder="Entrez votre e-mail"
         placeholderTextColor="#B3B3F5"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
         placeholder="Mot de passe"
         placeholderTextColor="#B3B3F5"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
       />
+
+      {/* Forgot Password */}
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword' as never)}>
         <Text style={styles.forgotPassword}>Mot de passe oublié ?</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+
+      {/* Login Button */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('GetStarted' as never)}
+      >
         <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
+
+      {/* Or continue with */}
       <Text style={styles.orText}>ou continuez avec</Text>
       <View style={styles.socialIcons}>
         <Image
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/831/831276.png' }}
+          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/831/831276.png' }} // Apple Icon
           style={styles.icon}
         />
         <Image
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/281/281764.png' }}
+          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/281/281764.png' }} // Google Icon
           style={styles.icon}
         />
       </View>
@@ -105,8 +78,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 150,
+    height: 150,
     alignSelf: 'center',
     marginBottom: 20,
   },

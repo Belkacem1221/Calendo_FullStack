@@ -11,6 +11,7 @@ import SignUpScreen from './src/screens/Auth/SignUpScreen';
 // Home Screens
 import HomeScreen from './src/screens/Home/HomeScreen';
 import GetStartedScreen from './src/screens/Home/GetStartedScreen';
+import { EventProvider } from './src/screens/contexts/EventContext';
 
 // Teams Screens
 import TeamsScreen from './src/screens/Teams/TeamsScreen';
@@ -20,7 +21,7 @@ import TeamDetailsScreen from './src/screens/Teams/TeamDetailsScreen';
 // Events Screens
 import AddEventScreen from './src/screens/Events/AddEventScreen';
 import EventDetailsScreen from './src/screens/Events/EventDetailsScreen';
-//import EditEventScreen from './src/screens/Events/EditEventScreen';
+import EditEventScreen from './src/screens/Events/EditEventScreen';
 
 // Bucketlists Screens
 import BucketlistsScreen from './src/screens/Bucketlists/BucketlistsScreen';
@@ -35,7 +36,7 @@ import VoteScreen from './src/screens/Votes/VoteScreen';
 import GeneralSettingsScreen from './src/screens/Settings/GeneralSettingsScreen';
 import SyncCalendarScreen from './src/screens/Settings/SyncCalendarScreen'
 
-// Placeholder imports for missing screens (add these imports when available)
+
 import CalendarScreen from './src/screens/Calendar/CalendarScreen';
 import CalendarDetailsScreen from './src/screens/Calendar/CalendarDetailsScreen';
 
@@ -48,23 +49,24 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
+    <EventProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         {/* Auth Screens */}
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
-          //options={{ title: 'Forgot Password', headerShown: true }}
+          options={{ title: 'Forgot Password', headerShown: false }}
         />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ title: 'Login', headerShown: true }}
+          options={{ title: 'Login', headerShown: false }}
         />
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
-          options={{ title: 'Sign Up', headerShown: true }}
+          options={{ title: 'Sign Up', headerShown: false }}
         />
 
         {/* Home Screens */}
@@ -110,7 +112,7 @@ export default function App() {
     name="TeamDetails"
     component={TeamDetailsScreen}
     options={{
-      headerShown: true,
+      headerShown: false,
       headerTitle: "Détails de l'équipe",
       headerBackTitle: "Retour",
     }}
@@ -149,7 +151,7 @@ export default function App() {
         />
         <Stack.Screen
           name="EditEvent"
-          component={EventDetailsScreen}
+          component={EditEventScreen}
           options={{ title: 'Edit Event', headerShown: false }}
         />
 
@@ -157,7 +159,7 @@ export default function App() {
         <Stack.Screen
           name="Bucketlists"
           component={BucketlistsScreen}
-          options={{ title: 'Bucketlists', headerShown: true }}
+          options={{ title: 'Bucketlists', headerShown: false }}
         />
         <Stack.Screen
           name="BucketlistDetails"
@@ -169,7 +171,7 @@ export default function App() {
   component={AddBucketListScreen}
   options={{
     title: 'Ajouter une Bucketlist',
-    headerShown: true,
+    headerShown: false,
     headerBackTitle: 'Retour',
   }}
 />
@@ -227,5 +229,6 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </EventProvider>
   );
 }

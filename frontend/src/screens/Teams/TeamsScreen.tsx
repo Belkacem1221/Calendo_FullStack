@@ -3,89 +3,39 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TeamController } from '../controllers/TeamController';
+import { Team } from '../models/Team';
+import { RootStackParamList } from '../../../types';
 
-type NavigationProp = StackNavigationProp<any, 'Teams'>;
-
-type TeamData = {
-  _id: string;
-  name: string;
-};
-
-function decodeToken(token: string): any {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(
-      decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-          .join('')
-      )
-    );
-  } catch (error) {
-    console.error('Erreur lors du décodage du token:', error);
-    return null;
-  }
-}
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Teams'>;
 
 export default function TeamsScreen() {
-  const [teams, setTeams] = useState<TeamData[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
 
-  const fetchTeams = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      console.log('Token récupéré:', token);
-  
-      if (!token) {
-        Alert.alert('Erreur', 'Vous devez être connecté pour voir vos équipes.');
-        return;
-      }
-  
-      const userData = decodeToken(token);
-      console.log('Données utilisateur décodées:', userData);
-  
-      if (!userData || !userData.id) {
-        throw new Error('Impossible de récupérer l\'ID utilisateur à partir du token.');
-      }
-  
-      const userTeamIds = userData.teams || [];
-      console.log('Liste des teamId de l\'utilisateur:', userTeamIds);
-  
-      const teamDetailsPromises = userTeamIds.map((teamId: string) =>
-        TeamController.getTeamDetails(teamId)
-      );
-  
-      const fetchedTeams = await Promise.all(teamDetailsPromises);
-      console.log('Équipes récupérées:', fetchedTeams);
-  
-      setTeams(fetchedTeams);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des équipes:', error);
-      Alert.alert('Erreur', 'Impossible de récupérer les équipes.');
-    }
-  };
-  
-
   useEffect(() => {
-    if (isFocused) {
-      fetchTeams();
-    }
+    const fetchTeams = async () => {
+      const fetchedTeams = await TeamController.getAllTeams();
+      setTeams(fetchedTeams);
+    };
+
+    fetchTeams();
   }, [isFocused]);
 
   const handleAddTeam = () => {
     navigation.navigate('AddTeam');
   };
 
-  const handleTeamDetails = (team: TeamData) => {
+  const handleTeamDetails = (team: Team) => {
     navigation.navigate('TeamDetails', { teamName: team.name });
   };
 
-  const renderTeamItem = ({ item }: { item: TeamData }) => (
+  const handleDeleteTeam = (teamId: string) => {
+    setTeams(teams.filter(team => team.id !== teamId));
+  };
+
+  const renderTeamItem = ({ item }: { item: Team }) => (
     <TouchableOpacity
       style={styles.teamContainer}
       onPress={() => handleTeamDetails(item)}
@@ -94,13 +44,18 @@ export default function TeamsScreen() {
         <Ionicons name="people-outline" size={24} color="#7F57FF" />
         <Text style={styles.teamName}>{item.name}</Text>
       </View>
-      <Ionicons name="chevron-forward-outline" size={24} color="#7F57FF" />
+      <View style={styles.actionButtons}>
+        <TouchableOpacity onPress={() => handleDeleteTeam(item.id)}>
+          <Ionicons name="trash-outline" size={24} color="#000" />
+        </TouchableOpacity>
+        <Ionicons name="chevron-forward-outline" size={24} color="#7F57FF" />
+      </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+     
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mes équipes</Text>
         <Text style={styles.headerSubtitle}>
@@ -108,16 +63,16 @@ export default function TeamsScreen() {
         </Text>
       </View>
 
-      {/* Add Team Button */}
+     
       <TouchableOpacity style={styles.addButton} onPress={handleAddTeam}>
         <Ionicons name="add-circle-outline" size={28} color="#FFF" />
         <Text style={styles.addButtonText}>Créer une équipe</Text>
       </TouchableOpacity>
 
-      {/* Teams List */}
+    
       <FlatList
         data={teams}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item.id}
         renderItem={renderTeamItem}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
@@ -129,7 +84,6 @@ export default function TeamsScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
@@ -185,6 +139,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   listContent: { paddingBottom: 20 },
   emptyText: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -16,43 +16,29 @@ export default function EventDetailsScreen() {
   const { eventId } = route.params;
 
   const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const fetchedEvent = await EventController.getUserEvents(eventId);
-        if (fetchedEvent && fetchedEvent.length > 0) {
-          setEvent(fetchedEvent[0]);
+        const fetchedEvent = await EventController.getEventById(eventId);
+        if (fetchedEvent) {
+          setEvent(fetchedEvent);
         } else {
-          Alert.alert("Erreur", "L'événement n'a pas été trouvé !");
+          alert("L'événement n'a pas été trouvé !");
           navigation.goBack();
         }
       } catch (error) {
-        Alert.alert("Erreur", "Impossible de récupérer les détails de l'événement.");
-        navigation.goBack();
-      } finally {
-        setLoading(false);
+        alert("Erreur lors de la récupération des détails de l'événement.");
       }
     };
+
     fetchEventDetails();
   }, [eventId]);
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Chargement des détails...</Text>
-      </View>
-    );
-  }
 
   if (!event) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Aucun détail disponible pour cet événement.</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Retour</Text>
-        </TouchableOpacity>
+        <Text style={styles.loadingText}>Chargement...</Text>
       </View>
     );
   }
@@ -61,7 +47,7 @@ export default function EventDetailsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+     
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
@@ -69,7 +55,7 @@ export default function EventDetailsScreen() {
         <Text style={styles.headerTitle}>Détails de l'événement</Text>
       </View>
 
-      {/* Event Details */}
+      
       <View style={styles.eventDetailsContainer}>
         <Text style={styles.title}>{title}</Text>
         <View style={styles.detailRow}>
@@ -86,7 +72,7 @@ export default function EventDetailsScreen() {
         </View>
       </View>
 
-      {/* Action Button */}
+      
       <TouchableOpacity
         style={styles.voteButton}
         onPress={() => navigation.navigate('VoteScreen', { eventId })}
@@ -98,27 +84,17 @@ export default function EventDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 20,
-  },
+  container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#7F57FF',
-    paddingVertical: 20,
-    paddingHorizontal: 15,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+    backgroundColor: '#7F57FF', 
+    paddingVertical: 40, 
+    paddingHorizontal: 20,
     marginBottom: 20,
   },
   backButton: {
     marginRight: 10,
-  },
-  backButtonText: {
-    color: '#FFF',
-    fontSize: 16,
   },
   headerTitle: {
     fontSize: 24,
@@ -129,49 +105,34 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 20,
-    color: '#666',
-  },
-  errorText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#FF0000',
+    color: '#333',
   },
   eventDetailsContainer: {
+    margin: 20,
     backgroundColor: '#FFF',
     padding: 20,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
     elevation: 3,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 10 },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-  details: {
-    fontSize: 16,
-    color: '#666',
-    marginLeft: 8,
-  },
+  details: { fontSize: 16, color: '#666', marginLeft: 8 },
   voteButton: {
-    marginTop: 30,
+    marginTop: 20,
+    marginHorizontal: 20,
     backgroundColor: '#6495ED',
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   voteButtonText: {
     color: '#FFF',
-    fontSize: 16,
     fontWeight: 'bold',
+    fontSize: 16,
+    alignSelf: 'center',
   },
 });

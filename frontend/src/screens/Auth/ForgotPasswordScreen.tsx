@@ -23,7 +23,7 @@ export default function ForgotPasswordScreen() {
     <View style={styles.container}>
       {/* Logo */}
       <Image
-        source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1055/1055687.png' }}
+        source={require('../../../assets/logo-transparent.png')}
         style={styles.logo}
       />
 
@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 150,
+    height: 150,
     alignSelf: 'center',
     marginBottom: 20,
   },

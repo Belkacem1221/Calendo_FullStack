@@ -1,119 +1,127 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Modal,
-  FlatList,
-  Alert,
+  ScrollView,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { EventController } from '../controllers/EventController';
-import { Event } from '../models/Event';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  team: string;
+  location: string;
+  startTime: string;
+  endTime: string;
+}
 
 export default function HomeScreen() {
   const navigation = useNavigation();
 
-  const [events, setEvents] = useState<Event[]>([]);
+  
+  const [events, setEvents] = useState<Event[]>([
+    {
+      id: '1',
+      title: '🍳 Petit-déjeuner au restaurant',
+      date: '2023-12-15',
+      team: 'Team 1',
+      location: 'Restaurant ABC',
+      startTime: '10:00 AM',
+      endTime: '11:00 AM',
+    },
+    {
+      id: '2',
+      title: '🏃‍♂️ Course au parc',
+      date: '2023-12-16',
+      team: 'Team 2',
+      location: 'Parc XYZ',
+      startTime: '7:00 AM',
+      endTime: '8:00 AM',
+    },
+    {
+      id: '3',
+      title: '🎬 Soirée cinéma',
+      date: '2023-12-20',
+      team: 'Team 3',
+      location: 'Cinéma 123',
+      startTime: '8:00 PM',
+      endTime: '10:00 PM',
+    },
+  ]);
+
   const [selectedDate, setSelectedDate] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const fetchEvents = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) {
-        Alert.alert('Erreur', 'Vous devez être connecté.');
-        return;
-      }
-      const userId = JSON.parse(atob(token.split('.')[1])).id;
-      const fetchedEvents = await EventController.getUserEvents(userId);
-      setEvents(fetchedEvents);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des événements:', error);
-      Alert.alert('Erreur', 'Impossible de récupérer les événements.');
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  const colors = ['#FFA07A', '#40E0D0', '#FFD700'];
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={events}
-        keyExtractor={(item) => item.id || Math.random().toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.eventCard, { borderLeftColor: '#6495ED' }]}
-            onPress={() => navigation.navigate('EventDetails', { eventId: item.id })}
-          >
-            <Text style={styles.eventTitle}>{item.title}</Text>
-            <View style={styles.eventDetailsRow}>
-              <MaterialIcons name="event" size={18} color="#6495ED" />
-              <Text style={styles.eventDetails}>{item.date}</Text>
-            </View>
-            <View style={styles.eventDetailsRow}>
-              <MaterialIcons name="group" size={18} color="#6495ED" />
-              <Text style={styles.eventDetails}>{item.category || 'Sans équipe'}</Text>
-            </View>
-            <View style={styles.eventDetailsRow}>
-              <MaterialIcons name="location-on" size={18} color="#6495ED" />
-              <Text style={styles.eventDetails}>{item.location}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        ListHeaderComponent={
-          <>
-            <View style={styles.header}>
-              <Text style={styles.headerTitle}>Bienvenue sur Calendo</Text>
-              <Text style={styles.headerSubtitle}>Gardez un œil sur vos prochains événements</Text>
-            </View>
-            <Calendar
-              onDayPress={(day) => setSelectedDate(day.dateString)}
-              markedDates={{
-                [selectedDate]: { selected: true, marked: true, selectedColor: '#6A5ACD' },
-              }}
-              style={styles.calendar}
-            />
-            <Text style={styles.eventListTitle}>Événements</Text>
-            <TouchableOpacity style={styles.addEventButton} onPress={() => setIsModalVisible(true)}>
-              <AntDesign name="pluscircleo" size={24} color="#FFF" />
-              <Text style={styles.addEventText}>Ajouter un événement</Text>
-            </TouchableOpacity>
-          </>
-        }
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            Aucun événement disponible. Ajoutez-en un pour commencer !
-          </Text>
-        }
-        contentContainerStyle={{ paddingBottom: 100 }}
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Bienvenue sur Calendo
+          
+        </Text>
+        
+        <Text style={styles.headerSubtitle}>Gardez un œil sur vos prochains événements</Text>
+      </View>
+
+      
+      <Calendar
+        onDayPress={(day) => setSelectedDate(day.dateString)}
+        markedDates={{
+          [selectedDate]: { selected: true, marked: true, selectedColor: '#6A5ACD' },
+        }}
+        style={styles.calendar}
       />
 
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsModalVisible(false)}
+     
+      <Text style={styles.eventListTitle}>Événements</Text>
+
+     
+      <TouchableOpacity
+        style={styles.addEventButton}
+        onPress={() => navigation.navigate('AddEvent' as never)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Créer un nouvel événement</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setIsModalVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        <MaterialIcons name="add-circle-outline" size={24} color="#FFF" />
+        <Text style={styles.addEventText}>Ajouter un événement</Text>
+      </TouchableOpacity>
+
+     
+      {events.map((event, index) => (
+  <TouchableOpacity
+    key={event.id}
+    style={[
+      styles.eventCard,
+      { borderLeftColor: colors[index % colors.length] }, 
+    ]}
+    onPress={() => navigation.navigate('EventDetails', { eventId: event.id })}
+  >
+    <Text style={styles.eventTitle}>{event.title}</Text>
+    <View style={styles.eventDetailsRow}>
+      <MaterialIcons name="event" size={18} color="#6495ED" />
+      <Text style={styles.eventDetails}>{event.date}</Text>
     </View>
+    <View style={styles.eventDetailsRow}>
+      <MaterialIcons name="group" size={18} color="#6495ED" />
+      <Text style={styles.eventDetails}>{event.team}</Text>
+    </View>
+    <View style={styles.eventDetailsRow}>
+      <MaterialIcons name="location-on" size={18} color="#6495ED" />
+      <Text style={styles.eventDetails}>{event.location}</Text>
+    </View>
+    <View style={styles.eventDetailsRow}>
+      <MaterialIcons name="access-time" size={18} color="#6495ED" />
+      <Text style={styles.eventDetails}>
+        {event.startTime} - {event.endTime}
+      </Text>
+    </View>
+  </TouchableOpacity>
+))}
+    </ScrollView>
   );
 }
 
@@ -185,40 +193,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginLeft: 8,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#AAA',
-    fontSize: 16,
-    marginTop: 20,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    width: '90%',
-    borderRadius: 10,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  closeButton: {
-    backgroundColor: '#6495ED',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  closeButtonText: {
-    textAlign: 'center',
-    color: '#FFF',
-    fontSize: 16,
   },
 });

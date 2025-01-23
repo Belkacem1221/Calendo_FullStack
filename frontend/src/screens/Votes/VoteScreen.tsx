@@ -36,11 +36,16 @@ export default function VoteScreen() {
           item.choice === choice ? { ...item, votes: item.votes + 1 } : item
         )
       );
-      navigation.navigate('EventDetails', { eventId });
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' as keyof RootStackParamList }],
+      });
     } catch (error) {
       alert('Erreur lors du vote. Veuillez réessayer.');
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -73,11 +78,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F9',
   },
   header: {
-    backgroundColor: '#7F57FF', // Same as the vote button color
-    paddingVertical: 40, // Adjusted padding to account for camera notch
+    backgroundColor: '#7F57FF', 
+    paddingVertical: 40, 
     paddingHorizontal: 16,
     alignItems: 'center',
-    marginBottom: 20, // Removed rounded bottom effect
+    marginBottom: 20, 
   },
   headerText: {
     fontSize: 24,

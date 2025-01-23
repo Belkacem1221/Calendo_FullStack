@@ -8,11 +8,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { TeamController } from '../controllers/TeamController';
+import { EventProvider } from '../contexts/EventContext';
 
 type RootStackParamList = {
   Teams: { newTeam?: string };
@@ -20,31 +20,28 @@ type RootStackParamList = {
 
 export default function AddTeamScreen() {
   const [teamName, setTeamName] = useState('');
-  const navigation = useNavigation();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleCreateTeam = async () => {
-    // Validation du champ
-    if (!teamName.trim()) {
-      Alert.alert('Erreur', "Le nom de l'équipe ne peut pas être vide.");
-      return;
-    }
-
     try {
-      // Appel API pour créer une équipe
-      await TeamController.createTeam(teamName);
-      Alert.alert('Succès', "L'équipe a été créée avec succès !");
-      navigation.goBack(); // Retour à la liste des équipes
+      await TeamController.createTeam(teamName); 
+      navigation.navigate('Teams', { newTeam: teamName });
+      setTeamName(''); 
     } catch (error) {
-      // Gestion des erreurs
-      Alert.alert(
-        'Erreur',
-        error instanceof Error ? error.message : "Une erreur s'est produite."
-      );
+      if (error instanceof Error) {
+      
+        setErrorMessage(error.message); 
+      } else {
+       
+        setErrorMessage("Une erreur inconnue s'est produite.");
+      }
     }
   };
+  
 
   const handleClosePopup = () => {
-    navigation.goBack(); // Fermer la popup
+    navigation.goBack();
   };
 
   return (
@@ -58,7 +55,7 @@ export default function AddTeamScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.popupContainer}>
-          {/* En-tête */}
+          
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeButton} onPress={handleClosePopup}>
               <Ionicons name="close" size={24} color="#FFF" />
@@ -67,8 +64,9 @@ export default function AddTeamScreen() {
             <Text style={styles.headerSubtitle}>Ajoute un nom pour ton équipe</Text>
           </View>
 
-          {/* Contenu */}
+          
           <View style={styles.content}>
+            {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
             <View style={styles.inputContainer}>
               <Ionicons name="people-outline" size={24} color="#7F57FF" />
               <TextInput
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond semi-transparent
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   popupContainer: {
     width: '90%',
@@ -113,19 +111,10 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
   },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFF',
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#DCDCDC',
-    marginTop: 8,
-  },
-  content: {
-    padding: 20,
-  },
+  headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#FFF' },
+  headerSubtitle: { fontSize: 16, color: '#DCDCDC', marginTop: 8 },
+  content: { padding: 20 },
+  error: { color: 'red', marginBottom: 10 },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -134,21 +123,12 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
   },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    marginLeft: 10,
-    color: '#333',
-  },
+  input: { flex: 1, fontSize: 16, marginLeft: 10, color: '#333' },
   createButton: {
     backgroundColor: '#7F57FF',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
-  createButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
+  createButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18 },
 });
