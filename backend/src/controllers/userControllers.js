@@ -70,20 +70,20 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // If password is provided, hash it
-    if (password) {
-      user.password = await bcrypt.hash(password, 10);
-    }
-    user.name = name || user.name;
-    user.email = email || user.email;
-    user.role = role || user.role;
+    // Update fields conditionally
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (password) user.password = password; // Middleware hashes it
+    if (role) user.role = role; // Be careful with role updates (add authorization checks)
 
     await user.save();
     res.status(200).json({ message: 'User updated successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Error updating user', error: err });
+    console.error('Error updating user:', err);
+    res.status(500).json({ message: 'Error updating user', error: err.message });
   }
 };
+
 
 // Delete user
 exports.deleteUser = async (req, res) => {
@@ -113,15 +113,17 @@ exports.updatePassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update password without hashing it again
-    user.password = password; // The password will be hashed automatically in the pre-save hook
-
+    // Directly update the password; the pre-save hook will handle hashing
+    user.password = password;
     await user.save();
+
     res.status(200).json({ message: 'Password updated successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Error updating password', error: err });
+    console.error('Error updating password:', err);
+    res.status(500).json({ message: 'Error updating password', error: err.message });
   }
 };
+
 
 
 
